@@ -189,3 +189,4 @@ src/nuget.exe
 src/bootstrap.ps1
 src/BuildOutput/
 src/output/
+src/*/output/
