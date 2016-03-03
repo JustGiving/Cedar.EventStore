@@ -181,3 +181,12 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
+
+# JG added
+src/build.ps1
+src/build.cmd
+src/jg-build-psake.ps1
+src/psake.psm1
+src/nuget.exe
+src/bootstrap.ps1
+src/Cedar.EventStore.nuspec
