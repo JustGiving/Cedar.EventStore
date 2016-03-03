@@ -190,3 +190,5 @@ src/psake.psm1
 src/nuget.exe
 src/bootstrap.ps1
 src/Cedar.EventStore.nuspec
+src/BuildOutput/
+src/output/
