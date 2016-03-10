@@ -84,7 +84,9 @@
                     }
                 }
             }
+
             _currentVersion++; // We want to start 
+
             return isEnd;
         }
     }

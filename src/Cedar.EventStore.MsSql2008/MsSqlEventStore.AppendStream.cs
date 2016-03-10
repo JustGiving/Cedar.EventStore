@@ -21,8 +21,8 @@
             new SqlMetaData("Id", SqlDbType.UniqueIdentifier),
             new SqlMetaData("Created", SqlDbType.DateTime, true, false, SortOrder.Unspecified, -1),
             new SqlMetaData("Type", SqlDbType.NVarChar, 128),
-            new SqlMetaData("JsonData", SqlDbType.VarBinary, 5000),
-            new SqlMetaData("JsonMetadata", SqlDbType.VarBinary, 2000)
+            new SqlMetaData("JsonData", SqlDbType.VarBinary, SqlMetaData.Max),
+            new SqlMetaData("JsonMetadata", SqlDbType.VarBinary, SqlMetaData.Max)
         };
 
         protected override Task AppendToStreamInternal(
