@@ -251,7 +251,7 @@
         {
             for(int i = 0; i < numberOfEvents; i++)
             {
-                var newStreamEvent = new NewStreamEvent(Guid.NewGuid(), "MyEvent", "{}");
+                var newStreamEvent = new NewStreamEvent(Guid.NewGuid(), "MyEvent", System.Text.Encoding.UTF8.GetBytes("{}"));
                 await eventStore.AppendToStream(streamId, ExpectedVersion.Any, newStreamEvent);
             }
         }

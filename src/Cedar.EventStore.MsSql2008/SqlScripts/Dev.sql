@@ -22,8 +22,8 @@ CREATE TABLE dbo.Events(
     Id                  UNIQUEIDENTIFIER                        NOT NULL,
     Created             DATETIME                                NOT NULL,
     [Type]              NVARCHAR(128)                           NOT NULL,
-    JsonData            NVARCHAR(max)                           NOT NULL,
-    JsonMetadata        NVARCHAR(max)                                   ,
+    JsonData            VARBINARY(5000)                         NOT NULL,
+    JsonMetadata        VARBINARY(2000)                                 ,
     CONSTRAINT PK_Events PRIMARY KEY CLUSTERED (Ordinal),
     CONSTRAINT FK_Events_Streams FOREIGN KEY (StreamIdInternal) REFERENCES dbo.Streams(IdInternal)
 );
@@ -35,8 +35,8 @@ CREATE TYPE dbo.NewStreamEvents AS TABLE (
     Id                  UNIQUEIDENTIFIER                        NOT NULL,
     Created             DATETIME            DEFAULT(GETDATE())  NOT NULL,
     [Type]              NVARCHAR(128)                           NOT NULL,
-    JsonData            NVARCHAR(max)                           NULL    ,
-    JsonMetadata        NVARCHAR(max)                           NULL
+    JsonData            VARBINARY(5000)                         NULL    ,
+    JsonMetadata        VARBINARY(2000)                         NULL
 );
 
 GO
@@ -53,10 +53,10 @@ BEGIN
         JsonData        ,
         JsonMetadata
     ) VALUES
-    ('00000000-0000-0000-0000-000000000001', 'type1', '\"data1\"', '\"meta1\"'),
-    ('00000000-0000-0000-0000-000000000002', 'type2', '\"data2\"', '\"meta2\"'),
-    ('00000000-0000-0000-0000-000000000003', 'type3', '\"data3\"', '\"meta3\"'),
-    ('00000000-0000-0000-0000-000000000004', 'type4', '\"data4\"', '\"meta4\"');
+    ('00000000-0000-0000-0000-000000000001', 'type1', CONVERT(VARBINARY(5000), '\"data1\"'), CONVERT(VARBINARY(2000),'\"meta1\"')),
+    ('00000000-0000-0000-0000-000000000002', 'type2', CONVERT(VARBINARY(5000), '\"data2\"'), CONVERT(VARBINARY(2000),'\"meta2\"')),
+    ('00000000-0000-0000-0000-000000000003', 'type3', CONVERT(VARBINARY(5000), '\"data3\"'), CONVERT(VARBINARY(2000),'\"meta3\"')),
+    ('00000000-0000-0000-0000-000000000004', 'type4', CONVERT(VARBINARY(5000), '\"data4\"'), CONVERT(VARBINARY(2000),'\"meta4\"'));
 
     SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
     BEGIN TRANSACTION CreateStream;
@@ -96,10 +96,10 @@ BEGIN
         JsonData        ,
         JsonMetadata
     ) VALUES
-    ('00000000-0000-0000-0000-000000000005', 'type1', '\"data1\"', '\"meta1\"'),
-    ('00000000-0000-0000-0000-000000000006', 'type2', '\"data2\"', '\"meta2\"'),
-    ('00000000-0000-0000-0000-000000000007', 'type3', '\"data3\"', '\"meta3\"'),
-    ('00000000-0000-0000-0000-000000000008', 'type4', '\"data4\"', '\"meta4\"');
+    ('00000000-0000-0000-0000-000000000005', 'type1', CONVERT(VARBINARY(5000), '\"data1\"'), CONVERT(VARBINARY(2000),'\"meta1\"')),
+    ('00000000-0000-0000-0000-000000000006', 'type1', CONVERT(VARBINARY(5000), '\"data2\"'), CONVERT(VARBINARY(2000),'\"meta2\"')),
+    ('00000000-0000-0000-0000-000000000007', 'type1', CONVERT(VARBINARY(5000), '\"data3\"'), CONVERT(VARBINARY(2000),'\"meta3\"')),
+    ('00000000-0000-0000-0000-000000000008', 'type1', CONVERT(VARBINARY(5000), '\"data4\"'), CONVERT(VARBINARY(2000),'\"meta4\"'));
 
     SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
     BEGIN TRANSACTION AppendStream;

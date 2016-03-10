@@ -3,6 +3,7 @@
     using System;
     using System.Data;
     using System.Data.SqlClient;
+    using System.Data.SqlTypes;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -14,14 +15,14 @@
 
     public partial class MsSqlEventStore
     {
-       private readonly SqlMetaData[] _appendToStreamSqlMetadata =
-       {
+        private readonly SqlMetaData[] _appendToStreamSqlMetadata =
+        {
             new SqlMetaData("StreamVersion", SqlDbType.Int, true, false, SortOrder.Unspecified, -1),
             new SqlMetaData("Id", SqlDbType.UniqueIdentifier),
             new SqlMetaData("Created", SqlDbType.DateTime, true, false, SortOrder.Unspecified, -1),
             new SqlMetaData("Type", SqlDbType.NVarChar, 128),
-            new SqlMetaData("JsonData", SqlDbType.NVarChar, SqlMetaData.Max),
-            new SqlMetaData("JsonMetadata", SqlDbType.NVarChar, SqlMetaData.Max),
+            new SqlMetaData("JsonData", SqlDbType.VarBinary, 5000),
+            new SqlMetaData("JsonMetadata", SqlDbType.VarBinary, 2000)
         };
 
         protected override Task AppendToStreamInternal(
@@ -280,8 +281,8 @@
                 var record = new SqlDataRecord(_appendToStreamSqlMetadata);
                 record.SetGuid(1, @event.EventId);
                 record.SetString(3, @event.Type);
-                record.SetString(4, @event.JsonData);
-                record.SetString(5, @event.JsonMetadata);
+                record.SetSqlBinary(4, new SqlBinary(@event.JsonData));
+                record.SetSqlBinary(5, new SqlBinary(@event.JsonMetadata));
                 return record;
             }).ToArray();
             return sqlDataRecords;

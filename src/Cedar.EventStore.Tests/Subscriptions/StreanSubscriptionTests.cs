@@ -27,7 +27,7 @@
                 {
                     await store.AppendToStream(streamId,
                         ExpectedVersion.NoStream,
-                        new NewStreamEvent(Guid.NewGuid(), "type", "{}"));
+                        new NewStreamEvent(Guid.NewGuid(), "type", System.Text.Encoding.UTF8.GetBytes("{}")));
 
                     var dropException = await eventReceivedException.Task.WithTimeout();
 

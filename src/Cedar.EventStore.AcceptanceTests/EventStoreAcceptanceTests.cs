@@ -53,7 +53,7 @@
                 .Select(eventNumber =>
                 {
                     var eventId = Guid.Parse("00000000-0000-0000-0000-" + eventNumber.ToString().PadLeft(12, '0'));
-                    return new NewStreamEvent(eventId, "type", "\"data\"", "\"metadata\"");
+                    return new NewStreamEvent(eventId, "type", System.Text.Encoding.UTF8.GetBytes("\"data\""), System.Text.Encoding.UTF8.GetBytes("\"metadata\""));
                 })
                 .ToArray();
         }
@@ -65,7 +65,7 @@
             {
                 var eventNumber = startId + i;
                 var eventId = Guid.Parse("00000000-0000-0000-0000-" + eventNumber.ToString().PadLeft(12, '0'));
-                var newStreamEvent = new NewStreamEvent(eventId, "type", "\"data\"", "\"metadata\"");
+                var newStreamEvent = new NewStreamEvent(eventId, "type", System.Text.Encoding.UTF8.GetBytes("\"data\""), System.Text.Encoding.UTF8.GetBytes("\"metadata\""));
                 streamEvents.Add(newStreamEvent);
             }
             return streamEvents.ToArray();
@@ -78,7 +78,7 @@
             DateTime created)
         {
             var eventId = Guid.Parse("00000000-0000-0000-0000-" + eventNumber.ToString().PadLeft(12, '0'));
-            return new StreamEvent(streamId, eventId, sequenceNumber, 0, created, "type", "\"data\"", "\"metadata\"");
+            return new StreamEvent(streamId, eventId, sequenceNumber, 0, created, "type", System.Text.Encoding.UTF8.GetBytes("\"data\""), System.Text.Encoding.UTF8.GetBytes("\"metadata\""));
         }
     }
 

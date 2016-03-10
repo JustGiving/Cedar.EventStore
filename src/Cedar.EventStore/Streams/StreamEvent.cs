@@ -7,8 +7,8 @@
         public readonly long Checkpoint;
         public readonly DateTimeOffset Created;
         public readonly Guid EventId;
-        public readonly string JsonData;
-        public readonly string JsonMetadata;
+        public readonly byte[] JsonData;
+        public readonly byte[] JsonMetadata;
         public readonly int StreamVersion;
         public readonly string StreamId;
         public readonly string Type;
@@ -20,8 +20,8 @@
             long checkpoint,
             DateTimeOffset created,
             string type,
-            string jsonData,
-            string jsonMetadata)
+            byte[] jsonData,
+            byte[] jsonMetadata)
         {
             EventId = eventId;
             StreamId = streamId;

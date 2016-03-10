@@ -18,8 +18,8 @@
                     const string streamId = "stream";
                     var events = new[]
                     {
-                        new NewStreamEvent(Guid.NewGuid(), "type", "\"data\"", "\"headers\""),
-                        new NewStreamEvent(Guid.NewGuid(), "type", "\"data\"", "\"headers\"")
+                        new NewStreamEvent(Guid.NewGuid(), "type", System.Text.Encoding.UTF8.GetBytes("\"data\""), System.Text.Encoding.UTF8.GetBytes("\"headers\"")),
+                        new NewStreamEvent(Guid.NewGuid(), "type", System.Text.Encoding.UTF8.GetBytes("\"data\""), System.Text.Encoding.UTF8.GetBytes("\"headers\""))
                     };
 
                     await eventStore.AppendToStream(streamId, ExpectedVersion.NoStream, events);
@@ -58,8 +58,8 @@
                     const string streamId = "stream";
                     var events = new[]
                     {
-                        new NewStreamEvent(Guid.NewGuid(), "type", "\"data\"", "\"headers\""),
-                        new NewStreamEvent(Guid.NewGuid(), "type", "\"data\"", "\"headers\"")
+                        new NewStreamEvent(Guid.NewGuid(), "type", System.Text.Encoding.UTF8.GetBytes("\"data\""), System.Text.Encoding.UTF8.GetBytes("\"headers\"")),
+                        new NewStreamEvent(Guid.NewGuid(), "type", System.Text.Encoding.UTF8.GetBytes("\"data\""), System.Text.Encoding.UTF8.GetBytes("\"headers\""))
                     };
 
                     await eventStore.AppendToStream(streamId, ExpectedVersion.NoStream, events);

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Data.SqlClient;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -110,8 +111,8 @@
                     var eventId = reader.GetGuid(2);
                     var created = reader.GetDateTime(3);
                     var type = reader.GetString(4);
-                    var jsonData = reader.GetString(5);
-                    var jsonMetadata = reader.GetString(6);
+                    var jsonData = reader.GetSqlBinary(5);
+                    var jsonMetadata = reader.GetSqlBinary(6);
 
                     var streamEvent = new StreamEvent(streamId,
                         eventId,
@@ -119,8 +120,8 @@
                         ordinal,
                         created,
                         type,
-                        jsonData,
-                        jsonMetadata);
+                        jsonData.Value,
+                        jsonMetadata.Value);
 
                     streamEvents.Add(streamEvent);
                 }

@@ -8,8 +8,8 @@
         internal readonly DateTimeOffset Created;
         internal readonly string StreamId;
         internal readonly Guid EventId;
-        internal readonly string JsonData;
-        internal readonly string JsonMetadata;
+        internal readonly byte[] JsonData;
+        internal readonly byte[] JsonMetadata;
         internal readonly int StreamVersion;
         internal readonly string Type;
 
@@ -20,8 +20,8 @@
             long checkpoint,
             DateTimeOffset created,
             string type,
-            string jsonData,
-            string jsonMetadata)
+            byte[] jsonData,
+            byte[] jsonMetadata)
         {
             StreamId = streamId;
             EventId = eventId;

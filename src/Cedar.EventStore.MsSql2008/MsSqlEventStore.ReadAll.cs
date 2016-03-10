@@ -50,8 +50,8 @@
                         var eventId = reader.GetGuid(3);
                         var created = reader.GetDateTime(4);
                         var type = reader.GetString(5);
-                        var jsonData = reader.GetString(6);
-                        var jsonMetadata = reader.GetString(7);
+                        var jsonData = reader.GetSqlBinary(6);
+                        var jsonMetadata = reader.GetSqlBinary(7);
 
                         var streamEvent = new StreamEvent(streamId,
                             eventId,
@@ -59,8 +59,8 @@
                             ordinal,
                             created,
                             type,
-                            jsonData,
-                            jsonMetadata);
+                            jsonData.Value,
+                            jsonMetadata.Value);
 
                         streamEvents.Add(streamEvent);
                     }
@@ -126,8 +126,9 @@
                         var eventId = reader.GetGuid(3);
                         var created = reader.GetDateTime(4);
                         var type = reader.GetString(5);
-                        var jsonData = reader.GetString(6);
-                        var jsonMetadata = reader.GetString(7);
+
+                        var jsonData = reader.GetSqlBinary(6);
+                        var jsonMetadata = reader.GetSqlBinary(7);
 
                         var streamEvent = new StreamEvent(streamId,
                             eventId,
@@ -135,8 +136,8 @@
                             ordinal,
                             created,
                             type,
-                            jsonData,
-                            jsonMetadata);
+                            jsonData.Value,
+                            jsonMetadata.Value);
 
                         streamEvents.Add(streamEvent);
                         lastOrdinal = ordinal;

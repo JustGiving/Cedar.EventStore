@@ -196,6 +196,7 @@
             private static readonly SHA1 s_sha1 = SHA1.Create();
             public readonly string Hash;
             public readonly string Id;
+            private static readonly object Gate = new object();
 
             public StreamIdInfo(string id)
             {
@@ -209,9 +210,15 @@
                     Hash = id;
                 }
 
-                var hashBytes = s_sha1.ComputeHash(Encoding.UTF8.GetBytes(id));
+                byte[] hashBytes;
+
+                lock(Gate)
+                {
+                    hashBytes = s_sha1.ComputeHash(Encoding.UTF8.GetBytes(id));
+                }
                 Hash = BitConverter.ToString(hashBytes).Replace("-", string.Empty);
             }
+
         }
     }
 }
