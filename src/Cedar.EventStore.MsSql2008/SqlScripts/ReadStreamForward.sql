@@ -22,10 +22,10 @@
       INNER JOIN Streams
          ON Events.StreamIdInternal = Streams.IdInternal
       WHERE Events.StreamIDInternal = @streamIDInternal AND Events.StreamVersion >= @StreamVersion
-   ORDER BY Events.Ordinal;
+   ORDER BY Events.StreamVersion;
 
      SELECT TOP(1)
             Events.StreamVersion
        FROM Events
       WHERE Events.StreamIDInternal = @streamIDInternal
-   ORDER BY Events.Ordinal DESC;
+   ORDER BY Events.StreamVersion DESC;
