@@ -103,7 +103,6 @@
     <Compile Include="InMemory\InMemoryEventStoreAcceptanceTests.cs" />
     <Compile Include="InMemory\InMemoryEventStoreFixture.cs" />
     <Compile Include="LoggingHelper.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SteamEventTests.cs" />
     <Compile Include="Subscriptions\StreanSubscriptionTests.cs" />
   </ItemGroup>

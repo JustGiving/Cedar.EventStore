@@ -105,8 +105,6 @@
     <Compile Include="..\Cedar.EventStore.AcceptanceTests\EventStoreAcceptanceTests.Subscriptions.cs">
       <Link>EventStoreAcceptanceTests.Subscriptions.cs</Link>
     </Compile>
-    <Compile Include="MsSqlEventStoreFixture.cs" />
-    <Compile Include="MsSqlEventStoreTests.cs" />
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
@@ -115,7 +113,6 @@
     <Compile Include="ExploratoryTests.cs" />
     <Compile Include="MsSqlEventStoreFixture.cs" />
     <Compile Include="MsSqlEventStoreAcceptanceTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -130,9 +127,7 @@
       <Name>Cedar.EventStore</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
