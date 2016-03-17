@@ -53,6 +53,44 @@
         }
 
         [Fact]
+        public async Task Can_subscribe_to_a_stream_from_start_before_events_are_written()
+        {
+            using (var fixture = GetFixture())
+            {
+                using (var eventStore = await fixture.GetEventStore())
+                {
+                    string streamId = "stream-1";
+
+                    var done = new TaskCompletionSource<StreamEvent>();
+                    var receivedEvents = new List<StreamEvent>();
+                    using (var subscription = await eventStore.SubscribeToStream(
+                        streamId,
+                        StreamVersion.Start,
+                        streamEvent =>
+                        {
+                            receivedEvents.Add(streamEvent);
+                            if (streamEvent.StreamVersion == 1)
+                            {
+                                done.SetResult(streamEvent);
+                            }
+                            return Task.CompletedTask;
+                        }))
+                    {
+                        await AppendEvents(eventStore, streamId, 2);
+
+                        var receivedEvent = await done.Task.WithTimeout();
+
+                        receivedEvents.Count.ShouldBe(2);
+                        subscription.StreamId.ShouldBe(streamId);
+                        receivedEvent.StreamId.ShouldBe(streamId);
+                        receivedEvent.StreamVersion.ShouldBe(1);
+                        subscription.LastVersion.ShouldBeGreaterThan(0);
+                    }
+                }
+            }
+        }
+
+        [Fact]
         public async Task Can_subscribe_to_all_stream_from_start()
         {
             using (var fixture = GetFixture())
@@ -91,6 +129,46 @@
         }
 
         [Fact]
+        public async Task Can_subscribe_to_all_stream_from_start_before_events_are_written()
+        {
+            using (var fixture = GetFixture())
+            {
+                using (var eventStore = await fixture.GetEventStore())
+                {
+                    string streamId1 = "stream-1";
+
+                    string streamId2 = "stream-2";
+
+                    var receiveEvents = new TaskCompletionSource<StreamEvent>();
+                    List<StreamEvent> receivedEvents = new List<StreamEvent>();
+                    using (await eventStore.SubscribeToAll(
+                        null,
+                        streamEvent =>
+                        {
+                            _testOutputHelper.WriteLine($"Received event {streamEvent.StreamId} {streamEvent.StreamVersion} {streamEvent.Checkpoint}");
+                            receivedEvents.Add(streamEvent);
+                            if (streamEvent.StreamId == streamId1 && streamEvent.StreamVersion == 3)
+                            {
+                                receiveEvents.SetResult(streamEvent);
+                            }
+                            return Task.CompletedTask;
+                        }))
+                    {
+                        await AppendEvents(eventStore, streamId1, 3);
+
+                        await AppendEvents(eventStore, streamId2, 3);
+
+                        await AppendEvents(eventStore, streamId1, 1);
+
+                        await receiveEvents.Task.WithTimeout();
+
+                        receivedEvents.Count.ShouldBe(7);
+                    }
+                }
+            }
+        }
+
+        [Fact]
         public async Task Can_subscribe_to_a_stream_from_end()
         {
             using (var fixture = GetFixture())
@@ -110,6 +188,7 @@
                         StreamVersion.End,
                         streamEvent =>
                         {
+                            _testOutputHelper.WriteLine($"Received event {streamEvent.StreamId} {streamEvent.StreamVersion} {streamEvent.Checkpoint}");
                             receivedCount++;
                             if (streamEvent.StreamVersion == 11)
                             {
@@ -119,6 +198,12 @@
                         }))
                     {
                         await AppendEvents(eventStore, streamId1, 2);
+
+                        var allEventsPage = await eventStore.ReadAllForwards(0, 30);
+                        foreach(var streamEvent in allEventsPage.StreamEvents)
+                        {
+                            _testOutputHelper.WriteLine(streamEvent.ToString());
+                        }
 
                         var receivedEvent = await receiveEvents.Task.WithTimeout();
 
