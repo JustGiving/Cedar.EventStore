@@ -3,9 +3,9 @@ BEGIN TRANSACTION AppendStream;
     DECLARE @streamIdInternal AS INT;
     DECLARE @latestStreamVersion AS INT;
 
-     SELECT @streamIdInternal = Streams.IdInternal
-       FROM Streams
-      WHERE Streams.Id = @streamId;
+     SELECT @streamIdInternal = dbo.Streams.IdInternal
+       FROM dbo.Streams
+      WHERE dbo.Streams.Id = @streamId;
 
          IF @streamIdInternal IS NULL
         BEGIN
@@ -15,10 +15,10 @@ BEGIN TRANSACTION AppendStream;
         END
 
         SELECT TOP(1)
-             @latestStreamVersion = Events.StreamVersion
-        FROM Events
-       WHERE Events.StreamIDInternal = @streamIdInternal
-    ORDER BY Events.Ordinal DESC;
+             @latestStreamVersion = dbo.Events.StreamVersion
+        FROM dbo.Events
+       WHERE dbo.Events.StreamIDInternal = @streamIdInternal
+    ORDER BY dbo.Events.Ordinal DESC;
 
         IF @latestStreamVersion != @expectedStreamVersion
         BEGIN
@@ -35,6 +35,7 @@ INSERT INTO dbo.Events (StreamIdInternal, StreamVersion, Id, Created, [Type], Js
             [Type],
             JsonData,
             JsonMetadata
-       FROM @newEvents;
+       FROM @newEvents
+   ORDER BY StreamVersion;
  
 COMMIT TRANSACTION AppendStream;
