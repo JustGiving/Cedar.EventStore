@@ -105,7 +105,6 @@
     <Compile Include="..\Cedar.EventStore.AcceptanceTests\EventStoreAcceptanceTests.Subscriptions.cs">
       <Link>EventStoreAcceptanceTests.Subscriptions.cs</Link>
     </Compile>
-    <Compile Include="ExploratoryTests.cs" />
     <Compile Include="MsSqlEventStoreFixture.cs" />
     <Compile Include="MsSqlEventStoreTests.cs" />
     <Compile Include="..\SharedAssemblyInfo.cs">
