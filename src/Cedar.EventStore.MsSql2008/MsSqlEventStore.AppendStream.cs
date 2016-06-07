@@ -47,6 +47,23 @@
             }
         }
 
+        private async Task RetryOnDeadLock(Func<Task> operation)
+        {
+            Exception exception;
+            do
+            {
+                exception = null;
+                try
+                {
+                    await operation();
+                }
+                catch(SqlException ex) when(ex.Number == 1205 || ex.Number == 1222) // Deadlock error code;
+                {
+                    exception = ex;
+                }
+            } while(exception != null);
+        }
+
         private async Task AppendToStreamExpectedVersionAny(
             StreamIdInfo streamIdInfo,
             int expectedVersion,
@@ -55,11 +72,11 @@
         {
             var sqlDataRecords = CreateSqlDataRecords(events);
 
-            using (var connection = _createConnection())
+            using(var connection = _createConnection())
             {
                 await connection.OpenAsync(cancellationToken).NotOnCapturedContext();
 
-                using (var command = new SqlCommand(_scripts.AppendStreamExpectedVersionAny, connection))
+                using(var command = new SqlCommand(_scripts.AppendStreamExpectedVersionAny, connection))
                 {
                     command.Parameters.AddWithValue("streamId", streamIdInfo.Hash);
                     command.Parameters.AddWithValue("streamIdOriginal", streamIdInfo.Id);
@@ -72,51 +89,44 @@
                             .ExecuteNonQueryAsync(cancellationToken)
                             .NotOnCapturedContext();
                     }
-                    catch (SqlException ex)
+                    // Check for unique constraint violation on 
+                    // https://technet.microsoft.com/en-us/library/aa258747%28v=sql.80%29.aspx
+                    catch(SqlException ex)
+                        when(ex.IsUniqueConstraintViolationOnIndex("IX_Events_StreamIdInternal_Id"))
                     {
-                        // Check for unique constraint violation on 
-                        // https://technet.microsoft.com/en-us/library/aa258747%28v=sql.80%29.aspx
-                        if (ex.IsUniqueConstraintViolationOnIndex("IX_Events_StreamIdInternal_Id"))
-                        {
-                            // Idempotency handling. Check if the events have already been written.
+                        // Idempotency handling. Check if the events have already been written.
+                        var page = await ReadStreamInternal(
+                            streamIdInfo.Id,
+                            StreamVersion.Start,
+                            events.Length,
+                            ReadDirection.Forward,
+                            connection,
+                            cancellationToken)
+                            .NotOnCapturedContext();
 
-                            var page = await ReadStreamInternal(
-                                    streamIdInfo.Id,
-                                    StreamVersion.Start,
-                                    events.Length,
-                                    ReadDirection.Forward,
-                                    connection,
-                                    cancellationToken)
-                                    .NotOnCapturedContext();
-
-                            if (events.Length > page.Events.Length)
-                            {
-                                throw new WrongExpectedVersionException(
-                                    Messages.AppendFailedWrongExpectedVersion(streamIdInfo.Id, expectedVersion),
-                                    ex);
-                            }
-
-                            for (int i = 0; i < Math.Min(events.Length, page.Events.Length); i++)
-                            {
-                                if (events[i].EventId != page.Events[i].EventId)
-                                {
-                                    throw new WrongExpectedVersionException(
-                                        Messages.AppendFailedWrongExpectedVersion(streamIdInfo.Id, expectedVersion),
-                                        ex);
-                                }
-                            }
-
-                            return;
-                        }
-
-                        if (ex.IsUniqueConstraintViolation())
+                        if(events.Length > page.Events.Length)
                         {
                             throw new WrongExpectedVersionException(
                                 Messages.AppendFailedWrongExpectedVersion(streamIdInfo.Id, expectedVersion),
                                 ex);
                         }
 
-                        throw;
+                        for(int i = 0; i < Math.Min(events.Length, page.Events.Length); i++)
+                        {
+                            if(events[i].EventId != page.Events[i].EventId)
+                            {
+                                throw new WrongExpectedVersionException(
+                                    Messages.AppendFailedWrongExpectedVersion(streamIdInfo.Id,
+                                        expectedVersion),
+                                    ex);
+                            }
+                        }
+                    }
+                    catch(SqlException ex) when(ex.IsUniqueConstraintViolation())
+                    {
+                        throw new WrongExpectedVersionException(
+                            Messages.AppendFailedWrongExpectedVersion(streamIdInfo.Id, expectedVersion),
+                            ex);
                     }
                 }
             }
