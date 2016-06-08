@@ -84,12 +84,19 @@
             }
             Task.Run(async () =>
             {
-                bool isEnd = false;
-                while (!isEnd || _shouldFetch.CompareExchange(false, true))
+                try
                 {
-                    isEnd = await DoFetch();
+                    bool isEnd = false;
+                    while (_shouldFetch.CompareExchange(false, true) || !isEnd)
+                    {
+                        isEnd = await DoFetch();
+                    }
                 }
-                _isFetching.Set(false);
+                catch { }
+                finally
+                {
+                    _isFetching.Set(false);
+                }
             }, IsDisposed);
         }
 
