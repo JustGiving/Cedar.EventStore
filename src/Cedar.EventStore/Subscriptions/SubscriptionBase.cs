@@ -13,7 +13,7 @@
         private readonly InterlockedBoolean _shouldFetch = new InterlockedBoolean();
         private readonly InterlockedBoolean _isFetching = new InterlockedBoolean();
         private readonly CancellationTokenSource _isDisposed = new CancellationTokenSource();
-        private static readonly ILog Logger = LogProvider.For<AllStreamSubscription>();
+        private static readonly ILog Logger = LogProvider.For<SubscriptionBase>();
 
         protected SubscriptionBase(
             IReadOnlyEventStore readOnlyEventStore,
@@ -90,14 +90,17 @@
                 try
                 {
                     bool isEnd = false;
-                    while (_shouldFetch.CompareExchange(false, true) || !isEnd)
+                    while(_shouldFetch.CompareExchange(false, true) || !isEnd)
                     {
                         isEnd = await DoFetch();
                     }
                     Logger.Debug($"Reached end of Fetch() for subscription '{Name}'");
 
                 }
-                catch { }
+                catch(Exception ex)
+                {
+                    Logger.ErrorException($"Error whilst fetching for subscription '{Name}'", ex);
+                }
                 finally
                 {
                     _isFetching.Set(false);

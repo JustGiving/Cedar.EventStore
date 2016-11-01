@@ -67,7 +67,7 @@
                     await StreamEventReceived(streamEvent).NotOnCapturedContext();
                     LastCheckpoint = streamEvent.Checkpoint;
                     _nextCheckpoint = streamEvent.Checkpoint + 1;
-                    Logger.Debug($"Value of _nextCheckpoint = {_nextCheckpoint}");
+                    Logger.Debug($"Value of _nextCheckpoint for '{Name}' = {_nextCheckpoint}");
                 }
                 catch(Exception ex)
                 {
