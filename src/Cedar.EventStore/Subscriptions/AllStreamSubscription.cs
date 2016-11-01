@@ -4,10 +4,12 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Cedar.EventStore.Infrastructure;
+    using Cedar.EventStore.Logging;
 
     public sealed class AllStreamSubscription : SubscriptionBase, IAllStreamSubscription
     {
         private long _nextCheckpoint;
+        private static readonly ILog Logger = LogProvider.For<AllStreamSubscription>();
 
         public AllStreamSubscription(
             long? fromCheckpoint,
@@ -65,6 +67,7 @@
                     await StreamEventReceived(streamEvent).NotOnCapturedContext();
                     LastCheckpoint = streamEvent.Checkpoint;
                     _nextCheckpoint = streamEvent.Checkpoint + 1;
+                    Logger.Debug($"Value of _nextCheckpoint = {_nextCheckpoint}");
                 }
                 catch(Exception ex)
                 {
@@ -74,13 +77,18 @@
                     }
                     catch
                     {
-                        //TODO logging
+                        Logger.Error($"Error invoking SubscriptionDropped with ex {ex}");
                     }
                     finally
                     {
                         Dispose();
                     }
                 }
+            }
+
+            if(isEnd)
+            {
+                Logger.Debug($"Subscription caught up, internal checkpoint = {_nextCheckpoint}");
             }
             
             return isEnd;

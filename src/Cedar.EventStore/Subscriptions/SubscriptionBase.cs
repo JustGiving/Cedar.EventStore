@@ -4,6 +4,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Cedar.EventStore.Infrastructure;
+    using Cedar.EventStore.Logging;
 
     public abstract class SubscriptionBase : IDisposable
     {
@@ -12,6 +13,7 @@
         private readonly InterlockedBoolean _shouldFetch = new InterlockedBoolean();
         private readonly InterlockedBoolean _isFetching = new InterlockedBoolean();
         private readonly CancellationTokenSource _isDisposed = new CancellationTokenSource();
+        private static readonly ILog Logger = LogProvider.For<AllStreamSubscription>();
 
         protected SubscriptionBase(
             IReadOnlyEventStore readOnlyEventStore,
@@ -58,6 +60,7 @@
 
         public void Dispose()
         {
+            Logger.Debug($"Disposing subscription '{Name}'");
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -91,11 +94,15 @@
                     {
                         isEnd = await DoFetch();
                     }
+                    Logger.Debug($"Reached end of Fetch() for subscription '{Name}'");
+
                 }
                 catch { }
                 finally
                 {
                     _isFetching.Set(false);
+                    Logger.Debug($"Setting isFetchting false for subscription '{Name}'");
+
                 }
             }, IsDisposed);
         }
